@@ -102,7 +102,7 @@
     <js-module src="www/nodejs_events.js" name="nodejs_events">
       <clobbers target="nodejs_events" />
     </js-module>
-    <js-module src="src/browser/NodeJSProxy.js"
+    <js-module src="src/electron/NodeJSProxy.js"
               name="NodeJS">
       <clobbers target="nodejs_proxy" />
     </js-module>
