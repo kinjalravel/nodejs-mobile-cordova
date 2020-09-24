@@ -1,15 +1,12 @@
 module.exports = exports = {
-    start: function() {
-        console.log('Start Node')
+    sendMessageToNode: function() {
+        console.log('sendMesageToNode', arguments);
     },
-    startWithScript: function() {
-        console.log('Start With Script');
+    startEngine: () => {
+        console.log('startEngine', arguments);
     },
-    channel: {
-        on: () => {},
-        post: () => {},
-        setListener: () => {},
-        send: () => {}
+    startEngineWithScript: () => {
+        console.log('startEngineWithScript', arguments);
     }
 }
 cordova.commandProxy.add('NodeJS', exports);
