@@ -103,16 +103,16 @@
         <param name="browser-package" value="NodeJS" />
       </feature>
     </config-file>
+    <js-module src="src/electron/NodeJSProxy.js"
+              name="NodeJS">
+      <runs/>
+    </js-module>
     <js-module src="www/nodejs_apis.js" name="nodejs">
       <clobbers target="nodejs" />
     </js-module>
 
     <js-module src="www/nodejs_events.js" name="nodejs_events">
       <clobbers target="nodejs_events" />
-    </js-module>
-    <js-module src="src/electron/NodeJSProxy.js"
-              name="NodeJS">
-      <runs/>
     </js-module>
   </platform>
 </plugin>
