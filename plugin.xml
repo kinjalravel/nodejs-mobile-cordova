@@ -15,13 +15,6 @@
     <engine name="cordova-electron" version=">=1.1.1"/>
    </engines>
 
-  <js-module src="www/nodejs_apis.js" name="nodejs">
-    <clobbers target="nodejs" />
-  </js-module>
-
-  <js-module src="www/nodejs_events.js" name="nodejs_events">
-    <clobbers target="nodejs_events" />
-  </js-module>
 
   <!-- ios -->
   <platform name="ios">
@@ -38,6 +31,13 @@
         <param name="onload" value= "true" />
       </feature>
     </config-file>
+    <js-module src="www/nodejs_apis.js" name="nodejs">
+      <clobbers target="nodejs" />
+    </js-module>
+
+    <js-module src="www/nodejs_events.js" name="nodejs_events">
+      <clobbers target="nodejs_events" />
+    </js-module>
 
     <header-file src="src/ios/CDVNodeJS.hh" />
     <source-file src="src/ios/CDVNodeJS.mm" />
@@ -68,6 +68,14 @@
         <param name="android-package" value="com.janeasystems.cdvnodejsmobile.NodeJS" />
       </feature>
     </config-file>
+
+    <js-module src="www/nodejs_apis.js" name="nodejs">
+      <clobbers target="nodejs" />
+    </js-module>
+
+    <js-module src="www/nodejs_events.js" name="nodejs_events">
+      <clobbers target="nodejs_events" />
+    </js-module>
 
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.INTERNET" />
