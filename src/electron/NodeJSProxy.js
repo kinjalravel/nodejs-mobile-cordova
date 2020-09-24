@@ -3,7 +3,7 @@ module.exports = exports = {
         console.log('sendMesageToNode', arguments);
     },
     startEngine: function(success, error, args) {
-        console.log('startEngine', arguments);
+        success();
     },
     startEngineWithScript: function(success, error, args) {
         console.log('startEngineWithScript', arguments);
