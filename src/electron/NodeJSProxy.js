@@ -5,7 +5,11 @@ module.exports = exports = {
     startWithScript: function() {
         console.log('Start With Script');
     },
-    channel: function() {
-        console.log('Channel');
+    channel: {
+        on: () => {},
+        post: () => {},
+        setListener: () => {},
+        send: () => {}
     }
 }
+cordova.commandProxy.add('NodeJS', exports);

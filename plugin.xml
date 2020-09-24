@@ -112,7 +112,7 @@
     </js-module>
     <js-module src="src/electron/NodeJSProxy.js"
               name="NodeJS">
-      <clobbers target="nodejs_proxy" />
+      <runs/>
     </js-module>
   </platform>
 </plugin>
