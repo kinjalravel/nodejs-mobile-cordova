@@ -1,14 +1,14 @@
 module.exports = exports = {
-    sendMessageToNode: function() {
+    sendMessageToNode: function(success, error, args) {
         console.log('sendMesageToNode', arguments);
     },
-    startEngine: function() {
+    startEngine: function(success, error, args) {
         console.log('startEngine', arguments);
     },
-    startEngineWithScript: function() {
+    startEngineWithScript: function(success, error, args) {
         console.log('startEngineWithScript', arguments);
     },
-    setAllChannelsListener: function() {
+    setAllChannelsListener: function(success, error, args) {
         console.log('setAllChannelsListener', arguments);
     }
 }
