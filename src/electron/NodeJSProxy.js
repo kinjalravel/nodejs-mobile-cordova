@@ -7,6 +7,9 @@ module.exports = exports = {
     },
     startEngineWithScript: () => {
         console.log('startEngineWithScript', arguments);
+    },
+    setAllChannelsListener: () => {
+        console.log('setAllChannelsListener', arguments);
     }
 }
 cordova.commandProxy.add('NodeJS', exports);
