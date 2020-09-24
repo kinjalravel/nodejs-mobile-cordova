@@ -2,13 +2,13 @@ module.exports = exports = {
     sendMessageToNode: function() {
         console.log('sendMesageToNode', arguments);
     },
-    startEngine: () => {
+    startEngine: function() {
         console.log('startEngine', arguments);
     },
-    startEngineWithScript: () => {
+    startEngineWithScript: function() {
         console.log('startEngineWithScript', arguments);
     },
-    setAllChannelsListener: () => {
+    setAllChannelsListener: function() {
         console.log('setAllChannelsListener', arguments);
     }
 }
