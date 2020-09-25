@@ -1,6 +1,6 @@
 module.exports = exports = {
     sendMessageToNode: function(success, error, args) {
-        console.log('sendMesageToNode', arguments);
+        Electron.ipcRenderer.send('sendMessageToNode', args);
     },
     startEngine: function(success, error, args) {
         success();
