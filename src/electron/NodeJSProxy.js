@@ -6,9 +6,11 @@ module.exports = exports = {
         success();
     },
     startEngineWithScript: function(success, error, args) {
+        success();
         console.log('startEngineWithScript', arguments);
     },
     setAllChannelsListener: function(success, error, args) {
+        success();
         console.log('setAllChannelsListener', arguments);
     }
 }
