@@ -10,7 +10,6 @@ module.exports = exports = {
         console.log('startEngineWithScript', arguments);
     },
     setAllChannelsListener: function(success, error, args) {
-        success();
         console.log('setAllChannelsListener', arguments);
     }
 }
