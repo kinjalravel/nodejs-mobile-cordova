@@ -5,7 +5,7 @@ module.exports = exports = {
     },
     startEngine: function(success, error, args) {
         console.log('Client::startEngine', args);
-        Electron.ipcRenderer.send('startEngine');
+        Electron.ipcRenderer.send('startEngine', args);
         Electron.ipcRenderer.once('startEngineResponse', (event, ...args) => {
             console.log('Client::startEngine::Result', ...args);
             success(args);
