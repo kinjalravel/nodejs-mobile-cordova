@@ -11,6 +11,7 @@ import org.apache.cordova.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
+import org.w3c.dom.Node;
 
 import android.util.Log;
 import android.app.Activity;
@@ -32,7 +33,7 @@ public class NodeJS extends CordovaPlugin {
   private static Activity activity = null;
   private static Context context = null;
   private static AssetManager assetManager = null;
-
+  private static NodeJS instance;
   private static String filesDir;
   private static final String PROJECT_ROOT = "www/nodejs-project";
   private static final String BUILTIN_ASSETS = "nodejs-mobile-cordova-assets";
@@ -62,6 +63,8 @@ public class NodeJS extends CordovaPlugin {
 
   private static final Object onlyOneEngineStartingAtATimeLock = new Object();
 
+  private static NodeEventListener listener;
+
   // Flag to indicate if node is ready to receive app events.
   private static boolean nodeIsReadyForAppEvents = false;
 
@@ -78,7 +81,7 @@ public class NodeJS extends CordovaPlugin {
   @Override
   public void pluginInitialize() {
     Log.d(LOGTAG, "pluginInitialize");
-
+    instance = this;
     activity = cordova.getActivity();
     context = activity.getBaseContext();
     assetManager = activity.getBaseContext().getAssets();
@@ -154,6 +157,9 @@ public class NodeJS extends CordovaPlugin {
 
     return true;
   }
+  public static void setNodeEventListner(NodeEventListener listener) {
+    NodeJS.listener = listener;
+  }
 
   @Override
   public void onPause(boolean multitasking) {
@@ -173,17 +179,34 @@ public class NodeJS extends CordovaPlugin {
     }
   }
 
-  private boolean sendMessageToNode(String channelName, String msg) {
-    sendMessageToNodeChannel(channelName, msg);
+  public static boolean sendMessageToNode(String channelName, String msg) {
+    instance.sendMessageToNodeChannel(channelName, msg);
     return true;
   }
 
   public static void sendMessageToApplication(String channelName, String msg) {
+    Log.d(LOGTAG, "sendMessageToApplication::" + channelName + "::" + msg);
     if (channelName.equals(SYSTEM_CHANNEL)) {
       // If it's a system channel call, handle it in the plugin native side.
       handleAppChannelMessage(msg);
     } else {
-      // Otherwise, send it to Cordova.
+      if (listener != null && channelName.equals("_EVENTS_")) {
+        try {
+          JSONObject event = new JSONObject(msg);
+          String eventName = event.getString("event");
+          JSONArray args = new JSONArray(event.getString("payload"));
+          if (null != listener) {
+            listener.onEvent(eventName, args);
+            switch (eventName) {
+              case "preAttachResponse":
+                JSONObject obj = args.getJSONObject(0);
+                listener.preAttachResponse(obj.getJSONObject("ums"), obj.getJSONObject("s"));
+            }
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
       sendMessageToCordova(channelName, msg);
     }
   }
@@ -191,6 +214,7 @@ public class NodeJS extends CordovaPlugin {
   public static void sendMessageToCordova(String channelName, String msg) {
     final String channel = new String(channelName);
     final String message = new String(msg);
+    Log.d(LOGTAG, "sendMessageToCordova::" + channelName + "::" + msg);
     NodeJS.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
