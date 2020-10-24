@@ -84,6 +84,7 @@
     </config-file>
 
     <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeJS.java" target-dir="src/com/janeasystems/cdvnodejsmobile/" />
+    <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeEventListener.java" target-dir="src/com/janeasystems/cdvnodejsmobile/" />
 
     <source-file src="src/common/cordova-bridge/cordova-bridge.h" target-dir="libs/cdvnodejsmobile/" />
     <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" target-dir="libs/cdvnodejsmobile/" />
