@@ -5,5 +5,6 @@ import org.json.JSONObject;
 
 public interface NodeEventListener {
     void onEvent(String event, JSONArray args);
-    void preAttachResponse(JSONObject ums, JSONObject s);
+    void onPreAttachResponse(JSONObject ums, JSONObject s);
+    void onServerStarted(String message);
 }

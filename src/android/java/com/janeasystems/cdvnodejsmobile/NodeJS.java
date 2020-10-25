@@ -200,7 +200,12 @@ public class NodeJS extends CordovaPlugin {
             switch (eventName) {
               case "preAttachResponse":
                 JSONObject obj = args.getJSONObject(0);
-                listener.preAttachResponse(obj.getJSONObject("ums"), obj.getJSONObject("s"));
+                listener.onPreAttachResponse(obj.getJSONObject("ums"), obj.getJSONObject("s"));
+                break;
+              case "serverStarted":
+                String message = args.getString(0);
+                listener.onServerStarted(message);
+                break;
             }
           }
         } catch (JSONException e) {
