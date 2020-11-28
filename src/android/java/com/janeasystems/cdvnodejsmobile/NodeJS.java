@@ -4,6 +4,12 @@
   Implements the plugin APIs exposed to the Cordova layer and routes messages
   between the Cordova layer and the Node.js engine.
  */
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  Implements the plugin APIs exposed to the Cordova layer and routes messages
+  between the Cordova layer and the Node.js engine.
+ */
 
 package com.janeasystems.cdvnodejsmobile;
 
@@ -181,6 +187,7 @@ public class NodeJS extends CordovaPlugin {
 
   public static boolean sendMessageToNode(String channelName, String msg) {
     instance.sendMessageToNodeChannel(channelName, msg);
+    handler(channelName, msg);
     return true;
   }
 
@@ -190,36 +197,41 @@ public class NodeJS extends CordovaPlugin {
       // If it's a system channel call, handle it in the plugin native side.
       handleAppChannelMessage(msg);
     } else {
-      if (listener != null && channelName.equals("_EVENTS_")) {
-        try {
-          JSONObject event = new JSONObject(msg);
-          String eventName = event.getString("event");
-          JSONArray args = new JSONArray(event.getString("payload"));
-          if (null != listener) {
-            listener.onEvent(eventName, args);
-            switch (eventName) {
-              case "preAttachResponse":
-                JSONObject obj = args.getJSONObject(0);
-                listener.onPreAttachResponse(obj.getJSONObject("ums"), obj.getJSONObject("s"));
-                break;
-              case "serverStarted":
-                String message = args.getString(0);
-                listener.onServerStarted(message);
-                break;
-            }
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
-        }
-      }
       sendMessageToCordova(channelName, msg);
     }
   }
 
+  private static void handler(String channelName, String msg) {
+    if (listener != null && channelName.equals("_EVENTS_")) {
+      try {
+        JSONObject event = new JSONObject(msg);
+        String eventName = event.getString("event");
+        JSONArray args = new JSONArray(event.getString("payload"));
+        if (null != listener) {
+          listener.onEvent(eventName, args);
+          switch (eventName) {
+            case "preAttachResponse":
+              JSONObject obj = args.getJSONObject(0);
+              listener.onPreAttachResponse(obj.getJSONObject("ums"), obj.getJSONObject("s"));
+              break;
+            case "serverStarted":
+              String message = args.getString(0);
+              listener.onServerStarted(message);
+              break;
+            case "chromebookInit":
+              listener.onChrombookInit();
+          }
+        }
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    }
+  }
   public static void sendMessageToCordova(String channelName, String msg) {
     final String channel = new String(channelName);
     final String message = new String(msg);
-    Log.d(LOGTAG, "sendMessageToCordova::" + channelName + "::" + msg);
+    //Log.d(LOGTAG, "sendMessageToCordova::" + channelName + "::" + msg);
+    handler(channelName, msg);
     NodeJS.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -234,6 +246,7 @@ public class NodeJS extends CordovaPlugin {
   }
 
   public static void handleAppChannelMessage(String msg) {
+    handler(SYSTEM_CHANNEL, msg);
     if (msg.equals("ready-for-app-events")) {
       nodeIsReadyForAppEvents=true;
     }
