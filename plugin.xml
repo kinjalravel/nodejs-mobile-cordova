@@ -46,6 +46,7 @@
     <header-file src="src/ios/NodeJSRunner.hh" />
     <source-file src="src/ios/NodeJSRunner.mm" />
     <header-file src="libs/ios/nodemobile/include"/>
+    <header-file src="src/ios/NodeEventDelegate.hh" />
 
     <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
 
