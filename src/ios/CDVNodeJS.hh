@@ -5,6 +5,7 @@
  */
 
 #import <Cordova/CDVPlugin.h>
+#import "NodeEventDelegate.hh"
 
 @interface CDVNodeJS : CDVPlugin
 {}
@@ -12,6 +13,8 @@
 @property NSString* allChannelsListenerCallbackId;
 
 + (CDVNodeJS*) activeInstance;
+
++ (void) setListener:(id)delegate;
 
 - (void) setAllChannelsListener:(CDVInvokedUrlCommand*)command;
 

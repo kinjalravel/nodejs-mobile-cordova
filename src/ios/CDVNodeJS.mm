@@ -10,6 +10,7 @@
 #import "NodeJSRunner.hh"
 #import <NodeMobile/NodeMobile.h>
 #import "cordova-bridge.h"
+#import "NodeEventDelegate.hh"
 
 #ifdef DEBUG
   #define LOG_FN NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -18,13 +19,108 @@
 #endif
 
 static CDVNodeJS* activeInstance = nil;
+static id<NodeEventDelegate> listener = nil;
+
 
 const char* SYSTEM_CHANNEL = "_SYSTEM_";
+const char* EVENT_CHANNEL = "_EVENTS_";
 
 static BOOL engineAlreadyStarted = NO;
 
 @implementation CDVNodeJS
 
++ (void) setListener:(id)delegate {
+    listener = delegate;
+}
+
+void handler(const char* channelName, const char* msg) {
+    NSString * channel = [NSString stringWithUTF8String:channelName];
+    if (nil != listener && [channel isEqual:[NSString stringWithUTF8String:EVENT_CHANNEL]]) {
+        NSError * error;
+        NSData * msgData = [[NSString stringWithUTF8String:msg] dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary * event = [NSJSONSerialization JSONObjectWithData:msgData options:0 error:&error];
+        NSString * eventName = event[@"event"];
+        NSString * nsPayload = event[@"payload"];
+        
+        NSData * argsData = [nsPayload dataUsingEncoding:NSUTF8StringEncoding];
+        NSArray * args = [NSJSONSerialization JSONObjectWithData:argsData options:0 error:&error];
+        [listener onEvent:eventName forArgs:args];
+        
+        NSArray * items = @[@"preAttachResponse", @"serverStarted", @"fsExists", @"fsMkdir", @"fsOpen", @"fsClose", @"fsRead", @"fsWrite"];
+        NSUInteger item = [items indexOfObject:eventName];
+        if (item == NSNotFound) {
+            return;
+        }
+        
+        switch (item) {
+            case 0: {//preattachResponse
+                NSData * argData = [args[0] dataUsingEncoding:NSUTF8StringEncoding];
+                NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:argData options:0 error:&error];
+                NSDictionary * ums = obj[@"ums"];
+                NSDictionary * s = obj[@"s"];
+                [listener onPreAttachResponse:ums forS:s];
+                break;
+            }
+            case 1: { //serverStarted
+                NSString * message = args[0];
+                [listener onServerStarted:message];
+                break;
+            }
+            case 2: {//fsExists
+                NSString * path = args[0];
+                NSNumber * cbIdx = args[1];
+                [listener onFsFileExists:path forCbIdx:cbIdx];
+                break;
+            }
+            case 3: {//fsMkdir
+                NSString * path = args[0];
+                NSString * dir = args[1];
+                NSNumber * cbIdx = args[2];
+                [listener onFsMkdir:path forDir:dir forCbIdx:cbIdx];
+                break;
+            }
+            case 4: {//fsOpen
+                NSString * path = args[0];
+                NSString * flags = args[1];
+                NSNumber * cbIdx = args[2];
+                [listener onFsOpen:path forFlags:flags forCbIdx:cbIdx];
+                break;
+            }
+            case 5: {//fsClose
+                NSNumber * fd = args[0];
+                NSNumber * cbIdx = args[1];
+                [listener onFsClose:fd forCbIdx:cbIdx];
+                break;
+            }
+            case 6: {//fsRead
+                NSNumber * fd = args[0];
+                NSNumber * offset = args[1];
+                NSNumber * length = args[2];
+                NSNumber * position = args[3];
+                NSNumber * cbIdx = args[4];
+                
+                [listener onFsRead:[fd unsignedLongLongValue] forOffset:[offset unsignedLongLongValue] forLength:[length unsignedIntValue] forPosition:[position unsignedLongLongValue] forCbIdx:cbIdx];
+                break;
+            }
+            case 7: {//fsWrite
+                NSNumber * fd = args[0];
+                NSArray * nsaBuffer = args[1];
+                NSNumber * offset = args[2];
+                NSNumber * length = args[3];
+                NSNumber * position = args[4];
+                NSNumber * cbIdx = args[5];
+                uint8_t buffer[[length unsignedLongLongValue]];
+                for (uint64_t x = 0; x < [length unsignedLongLongValue]; x++) {
+                    NSNumber * v = [nsaBuffer valueForKey: [@(x) stringValue]];
+                    buffer[x] = [v unsignedCharValue];
+                }
+
+                [listener onFsWrite:[fd unsignedLongLongValue] forBuffer:buffer forOffset:[offset unsignedLongLongValue] forLength:[length unsignedIntValue] forPosition:[position unsignedLongLongValue] forCbIdx:cbIdx];
+                break;
+            }
+        }
+    }
+}
 /**
  * A method that can be called from the C++ Node native module (i.e. cordova-bridge.ccp).
  */
@@ -47,6 +143,7 @@ void sendMessageToApplication(const char* channelName, const char* msg) {
 }
 
 void sendMessageToCordova(NSString* channelName, NSString* msg) {
+  handler([channelName UTF8String], [msg UTF8String]);
   NSMutableArray* arguments = [NSMutableArray array];
   [arguments addObject: channelName];
   [arguments addObject: msg];
@@ -57,6 +154,7 @@ void sendMessageToCordova(NSString* channelName, NSString* msg) {
 }
 
 void handleAppChannelMessage(NSString* msg) {
+  handler(SYSTEM_CHANNEL, [msg UTF8String]);
   if([msg hasPrefix:@"release-pause-event"]) {
     // The nodejs runtime has signaled it has finished handling a pause event.
     NSArray *eventArguments = [msg componentsSeparatedByString:@"|"];
@@ -258,6 +356,7 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
 - (void) sendMessageToNode:(CDVInvokedUrlCommand*)command {
   NSString* channelName = [command argumentAtIndex:0];
   NSString* msg = [command argumentAtIndex:1];
+  handler((const char*)[channelName UTF8String], (const char*)[msg UTF8String]);
   // Call the Node bridge API
   SendMessageToNodeChannel((const char*)[channelName UTF8String], (const char*)[msg UTF8String]);
 }
