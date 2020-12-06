@@ -46,7 +46,7 @@ void handler(const char* channelName, const char* msg) {
         NSArray * args = [NSJSONSerialization JSONObjectWithData:argsData options:0 error:&error];
         [listener onEvent:eventName forArgs:args];
         
-        NSArray * items = @[@"preAttachResponse", @"serverStarted", @"fsExists", @"fsMkdir", @"fsOpen", @"fsClose", @"fsRead", @"fsWrite"];
+        NSArray * items = @[@"preAttachResponse", @"serverStarted", @"fsExists", @"fsMkdir", @"fsOpen", @"fsClose", @"fsRead", @"fsWrite", @"fsStat"];
         NSUInteger item = [items indexOfObject:eventName];
         if (item == NSNotFound) {
             return;
@@ -68,8 +68,9 @@ void handler(const char* channelName, const char* msg) {
             }
             case 2: {//fsExists
                 NSString * path = args[0];
-                NSNumber * cbIdx = args[1];
-                [listener onFsFileExists:path forCbIdx:cbIdx];
+                NSString * file = args[1];
+                NSNumber * cbIdx = args[2];
+                [listener onFsFileExists:path forFile:file forCbIdx:cbIdx];
                 break;
             }
             case 3: {//fsMkdir
@@ -115,7 +116,14 @@ void handler(const char* channelName, const char* msg) {
                     buffer[x] = [v unsignedCharValue];
                 }
 
-                [listener onFsWrite:[fd unsignedLongLongValue] forBuffer:buffer forOffset:[offset unsignedLongLongValue] forLength:[length unsignedIntValue] forPosition:[position unsignedLongLongValue] forCbIdx:cbIdx];
+                [listener onFsWrite:[fd unsignedLongLongValue] forBuffer:buffer forOffset:[offset longLongValue] forLength:[length unsignedIntValue] forPosition:[position longLongValue] forCbIdx:cbIdx];
+                break;
+            }
+            case 8: {//fsStat
+                NSString * path = args[0];
+                NSString * file = args[1];
+                NSNumber * cbIdx = args[2];
+                [listener onFsStat:path forFile:file forCbIdx:cbIdx];
                 break;
             }
         }
