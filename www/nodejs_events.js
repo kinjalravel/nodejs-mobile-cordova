@@ -1,3 +1,4 @@
+cordova.define("nodejs-mobile-cordova.nodejs_events", function(require, exports, module) {
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -521,3 +522,5 @@ function unwrapListeners(arr) {
   }
   return ret;
 }
+
+});

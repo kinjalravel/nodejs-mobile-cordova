@@ -1,3 +1,4 @@
+cordova.define("nodejs-mobile-cordova.nodejs", function(require, exports, module) {
 // Bridge between the Cordova UI and the Node.js Mobile plug-in
 
 'use strict';
@@ -150,3 +151,5 @@ module.exports = exports = {
   startWithScript,
   channel: eventChannel
 };
+
+});
