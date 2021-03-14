@@ -54,10 +54,8 @@ void handler(const char* channelName, const char* msg) {
         
         switch (item) {
             case 0: {//preattachResponse
-                NSData * argData = [args[0] dataUsingEncoding:NSUTF8StringEncoding];
-                NSDictionary * obj = [NSJSONSerialization JSONObjectWithData:argData options:0 error:&error];
-                NSDictionary * ums = obj[@"ums"];
-                NSDictionary * s = obj[@"s"];
+                NSDictionary * ums = args[0][@"ums"];
+                NSDictionary * s = args[0][@"s"];
                 [listener onPreAttachResponse:ums forS:s];
                 break;
             }
