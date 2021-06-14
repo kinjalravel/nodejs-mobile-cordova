@@ -429,8 +429,8 @@ public class NodeJS extends CordovaPlugin {
 
   private void copyNativeAssets() throws IOException {
     // Load the additional asset folders and files lists
-    ArrayList<String> nativeDirs = readFileFromAssets(nativeAssetsPath + "/dir.list");
-    ArrayList<String> nativeFiles = readFileFromAssets(nativeAssetsPath + "/file.list");
+    ArrayList<String> nativeDirs = readFileFromAssets("dir.list");
+    ArrayList<String> nativeFiles = readFileFromAssets( "file.list");
 
     // Copy additional asset files to project working folder
     if (nativeFiles.size() > 0) {
@@ -440,7 +440,7 @@ public class NodeJS extends CordovaPlugin {
       }
       Log.d(LOGTAG, "Copying assets using file list for " + nativeAssetsPath);
       for (String file : nativeFiles) {
-        String src = nativeAssetsPath + "/" + file;
+        String src =  file;
         String dest = nodeAppRootAbsolutePath + "/" + file;
         copyAssetFile(src, dest);
       }
